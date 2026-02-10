@@ -49,4 +49,7 @@ public class Usuario {
                     + " Fecha Registro: " + this.fechaRegistro + " Sancionado: " + (sancionado? "SI" : "NO") + " Fecha Fin Sanción: " + fechaFinSancion;
         }
     }
+    public String getNombre(){
+        return this.nombre;
+    }
 }
