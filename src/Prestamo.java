@@ -53,4 +53,10 @@ public class Prestamo {
         return "Código Libro: " + this.codigoLibro + ", Socio: " + this.socio.getNombre() + ", Título Libro: " + this.tituloLibro + ", Fecha Préstamo: "
                 + this.fechaPrestamo + ", Fecha Devolución Prevista: " + this.fechaDevolucionPrevista;
     }
+    public String getCodigoLibro(){
+        return this.codigoLibro;
+    }
+    public LocalDate getFechaDevolucionReal(){
+        return this.fechaDevolucionReal;
+    }
 }
