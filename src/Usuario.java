@@ -41,15 +41,18 @@ public class Usuario {
     @Override
     public String toString(){
         if(sancionado) {
-            return "Usuario: " + this.nombre + " email: " + this.email + " Numero Socio: " + this.numeroSocio
-                    + " Fecha Registro: " + this.fechaRegistro + " Sancionado: " + (sancionado? "SI" : "NO");
+            return "Usuario: " + this.nombre + ", email: " + this.email + ", Numero Socio: " + this.numeroSocio
+                    + ", Fecha Registro: " + this.fechaRegistro + ", Sancionado: " + (sancionado? "SI" : "NO");
         }
         else{
-            return "Usuario: " + this.nombre + " email: " + this.email + " Numero Socio: " + this.numeroSocio
-                    + " Fecha Registro: " + this.fechaRegistro + " Sancionado: " + (sancionado? "SI" : "NO") + " Fecha Fin Sanción: " + fechaFinSancion;
+            return "Usuario: " + this.nombre + ", email: " + this.email + ", Numero Socio: " + this.numeroSocio
+                    + ", Fecha Registro: " + this.fechaRegistro + ", Sancionado: " + (sancionado? "SI" : "NO") + ", Fecha Fin Sanción: " + fechaFinSancion;
         }
     }
     public String getNombre(){
         return this.nombre;
+    }
+    public String getNumeroSocio(){
+        return this.numeroSocio;
     }
 }

@@ -24,6 +24,7 @@ public class Prestamo {
         this.tituloLibro=tituloLibro;
         this.fechaPrestamo=fechaPrestamo;
         this.fechaDevolucionPrevista=fechaPrestamo.plusDays(14);
+        this.fechaDevolucionReal=null;
     }
     public void registrarDevolucion(LocalDate fechaDevolucion) throws PrestamoInvalidoException{
         if(fechaDevolucion==null || fechaDevolucion.isBefore(this.fechaPrestamo)){
@@ -53,10 +54,17 @@ public class Prestamo {
         return "Código Libro: " + this.codigoLibro + ", Socio: " + this.socio.getNombre() + ", Título Libro: " + this.tituloLibro + ", Fecha Préstamo: "
                 + this.fechaPrestamo + ", Fecha Devolución Prevista: " + this.fechaDevolucionPrevista;
     }
+
     public String getCodigoLibro(){
         return this.codigoLibro;
     }
     public LocalDate getFechaDevolucionReal(){
         return this.fechaDevolucionReal;
+    }
+    public LocalDate getFechaDevolucionPrevista(){
+        return this.fechaDevolucionPrevista;
+    }
+    public LocalDate getFechaPrestamo() {
+        return this.fechaPrestamo;
     }
 }

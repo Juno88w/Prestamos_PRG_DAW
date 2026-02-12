@@ -1,4 +1,5 @@
 import java.time.*;
+import java.time.temporal.*;
 
 public class GestorBiblioteca {
     private static final int MAX_USUARIOS = 50;
@@ -43,9 +44,58 @@ public class GestorBiblioteca {
             }
         }
         Prestamo prestamo = new Prestamo(codigoLibro, usuario, tituloLibro, fechaPrestamo);
+        numeroPrestamos++;
         return prestamo;
     }
-    public boolean devolverLibro(String codigoLibro, LocalDate fechaDevolucion) throws PrestamoInvalidoException{
-
+    public boolean devolverLibro(String codigoLibro, LocalDate fechaDevolucion)
+            throws PrestamoInvalidoException{
+        for(int i=0;i<=numeroPrestamos;i++){
+            LocalDate fechaDevolucionPrevista = prestamos[i].getFechaDevolucionPrevista();
+            String libro=prestamos[i].getCodigoLibro();
+            //Lanzar excepcion si la fecha de devolucion es anterior a la de prestamo
+            if(libro.equals(codigoLibro) && fechaDevolucion.isBefore(prestamos[i].getFechaPrestamo())){
+                throw new PrestamoInvalidoException("La fecha de devolución es anterior a la de préstamo");
+            }
+            /*Si es el libro y la fecha de devolucion prevista es posterior o igual a la fecha de devolucion
+             registramos la devolucion como la fecha de devolucion*/
+            else if(libro.equals(codigoLibro) &&
+                    fechaDevolucionPrevista.isAfter(fechaDevolucion) ||
+                    fechaDevolucionPrevista.isEqual(fechaDevolucion)){
+                prestamos[i].registrarDevolucion(fechaDevolucion);
+                return true;
+            }
+            /* Si es el libro y la fecha de devolucion prevista es anterior a la fecha de devolucion
+            sancionamos al usuario con un día por cada día de retraso*/
+            else if(libro.equals(codigoLibro) &&
+                    fechaDevolucionPrevista.isBefore(fechaDevolucion)){
+                long retraso=ChronoUnit.DAYS.between(fechaDevolucion, fechaDevolucionPrevista);
+                prestamos[i].socio.sancionar((int)retraso, fechaDevolucion);
+                return true;
+            }
+            //Si es el libro y la fecha de devolucion no es nula es que ya se ha devuelto
+            else if(libro.equals(codigoLibro) && prestamos[i].getFechaDevolucionReal()!=null){
+                return false;
+            }
+        }
+        //En cualquier otro caso en el que no encuentra el libro devuelve false
+        return false;
     }
+    public Usuario buscarUsuario(String codigo){
+        for(int i=0; i<=numeroUsuarios;i++){
+            if(codigo.equals(usuarios[i].getNumeroSocio())){
+                return usuarios[i];
+            }
+        }
+        return null; //En cualquier otro caso devuelve null
+    }
+    public Prestamo getPrestamos(){
+        return prestamos[numeroPrestamos];
+    }
+    public Usuario getUsuarios(){
+        return usuarios[numeroUsuarios];
+    }
+    public String toString(){
+        return "Prestamos: \n" + this.getPrestamos() + "\nUsuarios: \n" + this.getUsuarios();
+    }
+
 }
