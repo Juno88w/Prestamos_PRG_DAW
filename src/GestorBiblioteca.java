@@ -1,4 +1,5 @@
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.*;
 
 public class GestorBiblioteca {
@@ -96,5 +97,10 @@ public class GestorBiblioteca {
     }
     public String toString(){
         return "Prestamos: \n" + this.getPrestamos() + "\nUsuarios: \n" + this.getUsuarios();
+    }
+    public LocalDate getFechaDevolucionPrevista(int numeroPrestamo){
+        DateTimeFormatter f1 = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDate fechaDevolucionPrevista = LocalDate.parse(prestamos[numeroPrestamo].getFechaDevolucionPrevista().format(f1));
+        return fechaDevolucionPrevista;
     }
 }

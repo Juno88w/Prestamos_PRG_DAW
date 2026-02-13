@@ -23,4 +23,9 @@ class LibroNoDisponibleException extends Exception{
         super(mensaje);
     }
 }
+class FechaInvalidaException extends Exception{
+    public FechaInvalidaException(String mensaje){
+        super(mensaje);
+    }
+}
 

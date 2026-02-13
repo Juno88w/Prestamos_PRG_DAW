@@ -2,7 +2,8 @@ import java.time.*;
 import java.util.Scanner;
 public class Menu {
     Scanner in = new Scanner(System.in);
-    public void mostrarMenu() throws UsuarioInvalidoException, UsuarioSancionadoException, UsuarioRepetidoException, PrestamoInvalidoException, LibroNoDisponibleException {
+    GestorBiblioteca gestor = new GestorBiblioteca();
+    public void mostrarMenu() throws UsuarioInvalidoException, FechaInvalidaException, UsuarioSancionadoException, UsuarioRepetidoException, PrestamoInvalidoException, LibroNoDisponibleException {
         int opc=0;
         do{
             System.out.println("===\tSISTEMA GESTIÓN BIBLIOTECA\t===");
@@ -25,8 +26,14 @@ public class Menu {
             switch (opc){
                 case 1:
                     this.registrarNuevoUsuario();
+                    System.out.println();
+                    System.out.println("Usuario correctamente registrado");
                     break;
                 case 2:
+                    this.realizarPrestamo();
+                    LocalDate fechaDevolucionPrevista = gestor.getFechaDevolucionPrevista(gestor.getPrestamos());
+                    System.out.println("Préstamo realizado");
+                    System.out.println("Devolución prevista: "  );
                     break;
                 case 3:
                     break;
@@ -49,19 +56,19 @@ public class Menu {
         System.out.println("Saliendo...");
         in.close();
     }
-    public LocalDate conversionFecha(String fecha){
-        if(fecha.matches("\\d{2}/\\d{2}/\\d{4}")){
-            String dia = fecha.substring(0,2);
-            String mes=fecha.substring(3,5);
-            String anio=fecha.substring(6);
-            LocalDate fechaConvertida=LocalDate.of(Integer.parseInt(anio), Integer.parseInt(mes), Integer.parseInt(dia));
+    public static LocalDate conversionFecha(String fecha) throws FechaInvalidaException{
+        if (fecha.matches("\\d{2}/\\d{2}/\\d{4}")) {
+            String dia = fecha.substring(0, 2);
+            String mes = fecha.substring(3, 5);
+            String anio = fecha.substring(6);
+            LocalDate fechaConvertida = LocalDate.of(Integer.parseInt(anio), Integer.parseInt(mes), Integer.parseInt(dia));
             return fechaConvertida;
         }
         else{
-            return null;
+            throw new FechaInvalidaException("Debes de poner una fecha es este formato (dd/mm/aaaa).");
         }
     }
-    public void registrarNuevoUsuario() throws UsuarioInvalidoException {
+    public void registrarNuevoUsuario() throws UsuarioInvalidoException, FechaInvalidaException, UsuarioRepetidoException {
         System.out.print("Nombre: ");
         String nombre=in.nextLine().trim();
         System.out.print("Email: ");
@@ -70,7 +77,21 @@ public class Menu {
         String numSocio=in.nextLine().trim();
         System.out.print("Fecha registro (dd/mm/aaaa): ");
         String fechaRegistro=in.nextLine().trim();
-        LocalDate fecha = this.conversionFecha(fechaRegistro);
+        LocalDate fecha = Menu.conversionFecha(fechaRegistro);
         Usuario usuario=new Usuario(nombre, email, numSocio, fecha);
+        gestor.registrarUsuario(usuario);
+    }
+    public void realizarPrestamo() throws FechaInvalidaException, PrestamoInvalidoException, UsuarioSancionadoException, LibroNoDisponibleException {
+        System.out.print("Código libro: ");
+        String codigoLibro=in.nextLine().trim();
+        System.out.print("Título: ");
+        String titulo = in.nextLine().trim();
+        System.out.print("Número de socio: ");
+        String numSocio = in.nextLine().trim();
+        System.out.println("Fecha de préstamo (dd/mm/aaaa): ");
+        String fechaPrestamo=in.nextLine().trim();
+        LocalDate fecha = Menu.conversionFecha(fechaPrestamo);
+        Usuario usuario = gestor.buscarUsuario(numSocio);
+        gestor.realizarPrestamo(codigoLibro, titulo, fecha, usuario);
     }
 }
