@@ -97,5 +97,4 @@ public class GestorBiblioteca {
     public String toString(){
         return "Prestamos: \n" + this.getPrestamos() + "\nUsuarios: \n" + this.getUsuarios();
     }
-
 }
