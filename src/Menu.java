@@ -1,4 +1,6 @@
 import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Scanner;
 public class Menu {
     Scanner in = new Scanner(System.in);
@@ -26,20 +28,18 @@ public class Menu {
             switch (opc){
                 case 1:
                     this.registrarNuevoUsuario();
-                    System.out.println();
-                    System.out.println("Usuario correctamente registrado");
                     break;
                 case 2:
                     this.realizarPrestamo();
-                    LocalDate fechaDevolucionPrevista = gestor.getFechaDevolucionPrevista(gestor.getPrestamos());
-                    System.out.println("Préstamo realizado");
-                    System.out.println("Devolución prevista: "  );
                     break;
                 case 3:
+                    this.devolverLibro();
                     break;
                 case 4:
+                    this.consultarEstadoUsuario();
                     break;
                 case 5:
+
                     break;
                 case 6:
                     break;
@@ -55,6 +55,11 @@ public class Menu {
         while(opc != 8);
         System.out.println("Saliendo...");
         in.close();
+    }
+    public static String formatearFecha(LocalDate fecha){
+        DateTimeFormatter f1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String fechaformatear =fecha.format(f1);
+        return fechaformatear;
     }
     public static LocalDate conversionFecha(String fecha) throws FechaInvalidaException{
         if (fecha.matches("\\d{2}/\\d{2}/\\d{4}")) {
@@ -80,8 +85,10 @@ public class Menu {
         LocalDate fecha = Menu.conversionFecha(fechaRegistro);
         Usuario usuario=new Usuario(nombre, email, numSocio, fecha);
         gestor.registrarUsuario(usuario);
+        System.out.println();
+        System.out.println("Usuario correctamente registrado");
     }
-    public void realizarPrestamo() throws FechaInvalidaException, PrestamoInvalidoException, UsuarioSancionadoException, LibroNoDisponibleException {
+    public void realizarPrestamo() throws FechaInvalidaException, PrestamoInvalidoException, UsuarioSancionadoException, LibroNoDisponibleException, UsuarioInvalidoException {
         System.out.print("Código libro: ");
         String codigoLibro=in.nextLine().trim();
         System.out.print("Título: ");
@@ -92,6 +99,35 @@ public class Menu {
         String fechaPrestamo=in.nextLine().trim();
         LocalDate fecha = Menu.conversionFecha(fechaPrestamo);
         Usuario usuario = gestor.buscarUsuario(numSocio);
-        gestor.realizarPrestamo(codigoLibro, titulo, fecha, usuario);
+        Prestamo prestamo = gestor.realizarPrestamo(codigoLibro, titulo, fecha, usuario);
+        System.out.println("Préstamo realizado");
+        LocalDate fechaDevolucionPrevista = prestamo.getFechaDevolucionPrevista();
+        System.out.println("Devolución prevista: " + Menu.formatearFecha(fechaDevolucionPrevista));
+    }
+    public void devolverLibro() throws FechaInvalidaException, PrestamoInvalidoException {
+        System.out.print("Código libro: ");
+        String codigoLibro=in.nextLine().trim();
+        System.out.println("Fecha de devolución (dd/mm/aaaa): ");
+        String fechaDevolucion=in.nextLine().trim();
+        LocalDate fecha = Menu.conversionFecha(fechaDevolucion);
+        boolean devolver = gestor.devolverLibro(codigoLibro, fecha);
+        if(devolver == true) {
+            long retraso = ChronoUnit.DAYS.between(LocalDate.now(), fecha);
+            Usuario usuario = gestor.buscarUsuario(codigoLibro);
+            System.out.println("Devolución retrasada con " + retraso + " días");
+            System.out.println("Usuario sancionado por " + retraso + " días (Hasta el " + Menu.formatearFecha(usuario.getFechaFinSancion()) + ")");
+        }
+        else{
+            System.out.println("El libro no se encuentra o ya se ha devuelto, así que el libro no se puede devolver");
+        }
+    }
+    public void consultarEstadoUsuario(){
+        System.out.println("Introduce el número de socio de un usuario: ");
+        String numerosocio=in.nextLine().trim();
+        Usuario usuario = gestor.buscarUsuario(numerosocio);
+        System.out.println(usuario.toString());
+    }
+    public void mostrarPrestamos(){
+
     }
 }

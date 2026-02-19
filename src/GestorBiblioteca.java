@@ -11,14 +11,14 @@ public class GestorBiblioteca {
     private int numeroPrestamos;
 
     public GestorBiblioteca(){
-        Usuario[] usuarios = new Usuario[MAX_USUARIOS];
-        Prestamo[] prestamos = new Prestamo[MAX_PRESTAMOS];
-        numeroUsuarios=0;
-        numeroPrestamos=0;
+        this.usuarios = new Usuario[MAX_USUARIOS];
+        this.prestamos = new Prestamo[MAX_PRESTAMOS];
+        this.numeroUsuarios=0;
+        this.numeroPrestamos=0;
     }
     public void registrarUsuario(Usuario usuario)throws UsuarioRepetidoException{
-        for(int i=0;i<usuarios.length;i++){
-            if(usuarios[i]==usuario){
+        for(int i=0;i<numeroUsuarios;i++){
+            if(usuarios[i].getNumeroSocio().equals(usuario.getNumeroSocio())){
                 throw new UsuarioRepetidoException("Este usuario ya está registrado");
             }
         }
@@ -26,7 +26,7 @@ public class GestorBiblioteca {
         numeroUsuarios++;
     }
     public Prestamo realizarPrestamo(String codigoLibro, String tituloLibro, LocalDate fechaPrestamo, Usuario usuario)
-            throws PrestamoInvalidoException, UsuarioSancionadoException, LibroNoDisponibleException{
+            throws PrestamoInvalidoException, UsuarioSancionadoException, LibroNoDisponibleException, UsuarioInvalidoException {
         if(codigoLibro == null || !codigoLibro.matches("\\p{Lu}{3}\\d{4}")){
             throw new PrestamoInvalidoException("El código del Libro no puede ser nulo y tiene que tener este formato LIB1234");
         }
@@ -36,21 +36,25 @@ public class GestorBiblioteca {
         if(fechaPrestamo == null || fechaPrestamo.isBefore(LocalDate.now())){
             throw new PrestamoInvalidoException("La fecha de prestamo no puede ser nula o posterior a la de hoy");
         }
+        if(usuario == null){
+            throw new UsuarioInvalidoException("El usuario no es válido");
+        }
         if(usuario.estaSancionado()){
             throw new UsuarioSancionadoException("El usuario está sancionado.");
         }
-        for(int i=0;i<prestamos.length;i++){
+        for(int i=0;i<numeroPrestamos;i++){
             if(prestamos[i].getCodigoLibro().equals(codigoLibro) && prestamos[i].getFechaDevolucionReal()==null){
                 throw new LibroNoDisponibleException("El libro está actualmente prestado");
             }
         }
         Prestamo prestamo = new Prestamo(codigoLibro, usuario, tituloLibro, fechaPrestamo);
+        prestamos[numeroPrestamos] = prestamo;
         numeroPrestamos++;
         return prestamo;
     }
     public boolean devolverLibro(String codigoLibro, LocalDate fechaDevolucion)
             throws PrestamoInvalidoException{
-        for(int i=0;i<=numeroPrestamos;i++){
+        for(int i=0;i<numeroPrestamos;i++){
             LocalDate fechaDevolucionPrevista = prestamos[i].getFechaDevolucionPrevista();
             String libro=prestamos[i].getCodigoLibro();
             //Lanzar excepcion si la fecha de devolucion es anterior a la de prestamo
@@ -69,8 +73,9 @@ public class GestorBiblioteca {
             sancionamos al usuario con un día por cada día de retraso*/
             else if(libro.equals(codigoLibro) &&
                     fechaDevolucionPrevista.isBefore(fechaDevolucion)){
-                long retraso=ChronoUnit.DAYS.between(fechaDevolucion, fechaDevolucionPrevista);
+                long retraso=ChronoUnit.DAYS.between(fechaDevolucionPrevista, fechaDevolucion);
                 prestamos[i].socio.sancionar((int)retraso, fechaDevolucion);
+                prestamos[i].registrarDevolucion(fechaDevolucion);
                 return true;
             }
             //Si es el libro y la fecha de devolucion no es nula es que ya se ha devuelto
@@ -82,25 +87,21 @@ public class GestorBiblioteca {
         return false;
     }
     public Usuario buscarUsuario(String codigo){
-        for(int i=0; i<=numeroUsuarios;i++){
+        for(int i=0; i<numeroUsuarios;i++){
             if(codigo.equals(usuarios[i].getNumeroSocio())){
                 return usuarios[i];
             }
         }
         return null; //En cualquier otro caso devuelve null
     }
-    public Prestamo getPrestamos(){
-        return prestamos[numeroPrestamos];
+    public Prestamo[] getPrestamos(){
+        return prestamos;
     }
-    public Usuario getUsuarios(){
-        return usuarios[numeroUsuarios];
+    public Usuario[] getUsuarios(){
+        return usuarios;
     }
+    @Override
     public String toString(){
         return "Prestamos: \n" + this.getPrestamos() + "\nUsuarios: \n" + this.getUsuarios();
-    }
-    public LocalDate getFechaDevolucionPrevista(int numeroPrestamo){
-        DateTimeFormatter f1 = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        LocalDate fechaDevolucionPrevista = LocalDate.parse(prestamos[numeroPrestamo].getFechaDevolucionPrevista().format(f1));
-        return fechaDevolucionPrevista;
     }
 }

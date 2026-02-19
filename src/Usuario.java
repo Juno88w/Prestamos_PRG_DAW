@@ -11,7 +11,7 @@ public class Usuario {
 
     Usuario(String nombre, String email, String numeroSocio, LocalDate fechaRegistro) throws UsuarioInvalidoException{
         if(nombre==null){
-            throw new UsuarioInvalidoException("No has indicado el nombre");
+            throw new UsuarioInvalidoException("No has indicado correctamente el nombre o no se encuentra el usuario");
         }
         if(email==null || !email.contains("@") || !email.contains(".")){
             throw new UsuarioInvalidoException("El email no puede ser nulo y tiene que contener un @ y un punto(.)");
@@ -40,7 +40,7 @@ public class Usuario {
     }
     @Override
     public String toString(){
-        if(sancionado) {
+        if(sancionado == false) {
             return "Usuario: " + this.nombre + ", email: " + this.email + ", Numero Socio: " + this.numeroSocio
                     + ", Fecha Registro: " + this.fechaRegistro + ", Sancionado: " + (sancionado? "SI" : "NO");
         }
@@ -54,5 +54,8 @@ public class Usuario {
     }
     public String getNumeroSocio(){
         return this.numeroSocio;
+    }
+    public LocalDate getFechaFinSancion(){
+        return this.fechaFinSancion;
     }
 }

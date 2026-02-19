@@ -16,7 +16,7 @@ public class Prestamo {
         if(tituloLibro == null){
             throw new PrestamoInvalidoException("El título del libro no puede ser nulo.");
         }
-        if(fechaPrestamo == null || fechaPrestamo.isBefore(LocalDate.now())){
+        if(fechaPrestamo == null || fechaPrestamo.isAfter(LocalDate.now())){
             throw new PrestamoInvalidoException("La fecha de prestamo no puede ser nula o posterior a la de hoy");
         }
         this.codigoLibro=codigoLibro;
@@ -34,7 +34,7 @@ public class Prestamo {
     }
     public int calcularDiasRetraso(){
         if(this.fechaDevolucionReal.isAfter(fechaDevolucionPrevista)){
-            long diferencia = ChronoUnit.DAYS.between(fechaDevolucionReal, fechaDevolucionPrevista);
+            long diferencia = ChronoUnit.DAYS.between(fechaDevolucionPrevista, fechaDevolucionReal);
             return (int)diferencia;
         }
         else{
