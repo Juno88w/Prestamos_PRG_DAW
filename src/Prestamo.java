@@ -52,7 +52,7 @@ public class Prestamo {
     @Override
     public String toString(){
         return "Código Libro: " + this.codigoLibro + ", Socio: " + this.socio.getNombre() + ", Título Libro: " + this.tituloLibro + ", Fecha Préstamo: "
-                + this.fechaPrestamo + ", Fecha Devolución Prevista: " + this.fechaDevolucionPrevista;
+                + Menu.formatearFecha(this.fechaPrestamo) + ", Fecha Devolución Prevista: " + Menu.formatearFecha(this.fechaDevolucionPrevista);
     }
 
     public String getCodigoLibro(){

@@ -52,6 +52,7 @@ public class GestorBiblioteca {
         numeroPrestamos++;
         return prestamo;
     }
+    //Comentario Recuerdo: Creo que está mal y falta gestionarlo con el array...
     public boolean devolverLibro(String codigoLibro, LocalDate fechaDevolucion)
             throws PrestamoInvalidoException{
         for(int i=0;i<numeroPrestamos;i++){
@@ -102,6 +103,20 @@ public class GestorBiblioteca {
     }
     @Override
     public String toString(){
-        return "Prestamos: \n" + this.getPrestamos() + "\nUsuarios: \n" + this.getUsuarios();
+        String mensajep = "Préstamos\n";
+        for(int i = 0; i<numeroPrestamos; i++){
+            mensajep += prestamos[i].toString() + "\n";
+        }
+        String mensajeu = "Usuarios\n";
+        for(int i = 0; i<numeroUsuarios; i++){
+            mensajeu += usuarios[i].toString() + "\n";
+        }
+        return mensajep + mensajeu;
+    }
+    public int getNumeroPrestamos(){
+        return this.numeroPrestamos;
+    }
+    public int getNumeroUsuarios(){
+        return this.numeroUsuarios;
     }
 }

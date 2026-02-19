@@ -39,11 +39,13 @@ public class Menu {
                     this.consultarEstadoUsuario();
                     break;
                 case 5:
-
+                    this.mostrarPrestamosActivos();
                     break;
                 case 6:
+                    this.mostrarUsuariosSancionados();
                     break;
                 case 7:
+                    this.actualizarSanciones();
                     break;
                 case 8:
                     break;
@@ -127,7 +129,47 @@ public class Menu {
         Usuario usuario = gestor.buscarUsuario(numerosocio);
         System.out.println(usuario.toString());
     }
-    public void mostrarPrestamos(){
-
+    public void mostrarPrestamosActivos(){
+        Prestamo[] prestamos = gestor.getPrestamos();
+        boolean activo = false;
+        for(int i = 0; i<gestor.getNumeroPrestamos(); i++){
+            if(prestamos[i].getFechaDevolucionReal()==null){
+                System.out.println(prestamos[i].toString());
+                activo = true;
+            }
+        }
+        if (activo == false){
+            System.out.println("No hay ningún préstamo activo");
+        }
     }
+    public void mostrarUsuariosSancionados(){
+        Usuario[] usuarios = gestor.getUsuarios();
+        boolean sancionado = false;
+        for(int i=0;i<gestor.getNumeroUsuarios(); i++){
+            if(usuarios[i].estaSancionado()){
+                System.out.println(usuarios[i].toString());
+                sancionado = true;
+            }
+        }
+        if(sancionado == false){
+            System.out.println("No hay ningún usuario sancionado");
+        }
+    }
+    public void actualizarSanciones(){
+        Usuario[] usuarios = gestor.getUsuarios();
+        boolean actualizar = false;
+        for(int i=0; i<gestor.getNumeroUsuarios(); i++){
+            if(usuarios[i].getFechaFinSancion().isBefore(LocalDate.now())){
+                usuarios[i].levantarSancion();
+                actualizar = true;
+            }
+        }
+        if(actualizar){
+            System.out.println("Sanciones actualizadas correctamente");
+        }
+        else{
+            System.out.println("No hay sanciones que actualizar");
+        }
+    }
+
 }

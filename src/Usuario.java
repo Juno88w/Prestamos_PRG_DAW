@@ -42,11 +42,11 @@ public class Usuario {
     public String toString(){
         if(sancionado == false) {
             return "Usuario: " + this.nombre + ", email: " + this.email + ", Numero Socio: " + this.numeroSocio
-                    + ", Fecha Registro: " + this.fechaRegistro + ", Sancionado: " + (sancionado? "SI" : "NO");
+                    + ", Fecha Registro: " + Menu.formatearFecha(this.fechaRegistro) + ", Sancionado: " + (sancionado? "SI" : "NO");
         }
         else{
             return "Usuario: " + this.nombre + ", email: " + this.email + ", Numero Socio: " + this.numeroSocio
-                    + ", Fecha Registro: " + this.fechaRegistro + ", Sancionado: " + (sancionado? "SI" : "NO") + ", Fecha Fin Sanción: " + fechaFinSancion;
+                    + ", Fecha Registro: " + Menu.formatearFecha(this.fechaRegistro) + ", Sancionado: " + (sancionado? "SI" : "NO") + ", Fecha Fin Sanción: " + Menu.formatearFecha(fechaFinSancion);
         }
     }
     public String getNombre(){
