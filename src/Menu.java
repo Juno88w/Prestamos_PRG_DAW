@@ -97,7 +97,7 @@ public class Menu {
         String titulo = in.nextLine().trim();
         System.out.print("Número de socio: ");
         String numSocio = in.nextLine().trim();
-        System.out.println("Fecha de préstamo (dd/mm/aaaa): ");
+        System.out.print("Fecha de préstamo (dd/mm/aaaa): ");
         String fechaPrestamo=in.nextLine().trim();
         LocalDate fecha = Menu.conversionFecha(fechaPrestamo);
         Usuario usuario = gestor.buscarUsuario(numSocio);
@@ -112,12 +112,23 @@ public class Menu {
         System.out.println("Fecha de devolución (dd/mm/aaaa): ");
         String fechaDevolucion=in.nextLine().trim();
         LocalDate fecha = Menu.conversionFecha(fechaDevolucion);
+        Prestamo[] prestamos = gestor.getPrestamos();
+        Prestamo prestamoActual = null;
+        for(int i=0;i<gestor.getNumeroPrestamos();i++){
+            if(prestamos[i].getCodigoLibro().equals(codigoLibro) && prestamos[i].getFechaDevolucionReal()==null){
+                prestamoActual = prestamos[i];
+            }
+        }
         boolean devolver = gestor.devolverLibro(codigoLibro, fecha);
-        if(devolver == true) {
-            long retraso = ChronoUnit.DAYS.between(LocalDate.now(), fecha);
-            Usuario usuario = gestor.buscarUsuario(codigoLibro);
-            System.out.println("Devolución retrasada con " + retraso + " días");
-            System.out.println("Usuario sancionado por " + retraso + " días (Hasta el " + Menu.formatearFecha(usuario.getFechaFinSancion()) + ")");
+        if(devolver) {
+            if(prestamoActual != null && fecha.isAfter(prestamoActual.getFechaDevolucionPrevista())) {
+                long retraso = ChronoUnit.DAYS.between(prestamoActual.getFechaDevolucionPrevista(), fecha);
+                System.out.println("Devolución retrasada con " + retraso + " días");
+                System.out.println("Usuario sancionado por " + retraso + " días (Hasta el " + Menu.formatearFecha(prestamoActual.socio.getFechaFinSancion()) + ")");
+            }
+            else{
+                System.out.println("Devolución registrada correctamente sin sanciones");
+            }
         }
         else{
             System.out.println("El libro no se encuentra o ya se ha devuelto, así que el libro no se puede devolver");
@@ -126,8 +137,13 @@ public class Menu {
     public void consultarEstadoUsuario(){
         System.out.println("Introduce el número de socio de un usuario: ");
         String numerosocio=in.nextLine().trim();
-        Usuario usuario = gestor.buscarUsuario(numerosocio);
-        System.out.println(usuario.toString());
+        try {
+            Usuario usuario = gestor.buscarUsuario(numerosocio);
+            System.out.println(usuario.toString());
+        }
+        catch(NullPointerException npe){
+            System.out.println("El usuario no se encuentra");
+        }
     }
     public void mostrarPrestamosActivos(){
         Prestamo[] prestamos = gestor.getPrestamos();
