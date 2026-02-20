@@ -33,8 +33,15 @@ public class Prestamo {
         this.fechaDevolucionReal=fechaDevolucion;
     }
     public int calcularDiasRetraso(){
-        if(this.fechaDevolucionReal.isAfter(fechaDevolucionPrevista)){
-            long diferencia = ChronoUnit.DAYS.between(fechaDevolucionPrevista, fechaDevolucionReal);
+        LocalDate fechaCalcularReal;
+        if(this.fechaDevolucionReal!=null){
+            fechaCalcularReal = this.fechaDevolucionReal;
+        }
+        else{
+            fechaCalcularReal=LocalDate.now();
+        }
+        if(fechaCalcularReal.isAfter(fechaDevolucionPrevista)){
+            long diferencia = ChronoUnit.DAYS.between(fechaDevolucionPrevista, fechaCalcularReal);
             return (int)diferencia;
         }
         else{

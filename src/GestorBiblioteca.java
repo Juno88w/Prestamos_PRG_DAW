@@ -33,7 +33,7 @@ public class GestorBiblioteca {
         if(tituloLibro == null){
             throw new PrestamoInvalidoException("El título del libro no puede ser nulo.");
         }
-        if(fechaPrestamo == null || fechaPrestamo.isBefore(LocalDate.now())){
+        if(fechaPrestamo == null || fechaPrestamo.isAfter(LocalDate.now())){
             throw new PrestamoInvalidoException("La fecha de prestamo no puede ser nula o posterior a la de hoy");
         }
         if(usuario == null){

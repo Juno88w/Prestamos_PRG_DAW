@@ -25,33 +25,38 @@ public class Menu {
             catch (NumberFormatException nfe){
                 System.out.print(""); //Si no es un número hará el default del switch por lo que escribirá Escoge una opción válida
             }
-            switch (opc){
-                case 1:
-                    this.registrarNuevoUsuario();
-                    break;
-                case 2:
-                    this.realizarPrestamo();
-                    break;
-                case 3:
-                    this.devolverLibro();
-                    break;
-                case 4:
-                    this.consultarEstadoUsuario();
-                    break;
-                case 5:
-                    this.mostrarPrestamosActivos();
-                    break;
-                case 6:
-                    this.mostrarUsuariosSancionados();
-                    break;
-                case 7:
-                    this.actualizarSanciones();
-                    break;
-                case 8:
-                    break;
-                default:
-                    System.out.println("Escoge una opción válida");
-                    break;
+            try {
+                switch (opc) {
+                    case 1:
+                        this.registrarNuevoUsuario();
+                        break;
+                    case 2:
+                        this.realizarPrestamo();
+                        break;
+                    case 3:
+                        this.devolverLibro();
+                        break;
+                    case 4:
+                        this.consultarEstadoUsuario();
+                        break;
+                    case 5:
+                        this.mostrarPrestamosActivos();
+                        break;
+                    case 6:
+                        this.mostrarUsuariosSancionados();
+                        break;
+                    case 7:
+                        this.actualizarSanciones();
+                        break;
+                    case 8:
+                        break;
+                    default:
+                        System.out.println("Escoge una opción válida");
+                        break;
+                }
+            }
+            catch (Exception e){
+                System.out.println("Error");
             }
         }
         while(opc != 8);
@@ -109,7 +114,7 @@ public class Menu {
     public void devolverLibro() throws FechaInvalidaException, PrestamoInvalidoException {
         System.out.print("Código libro: ");
         String codigoLibro=in.nextLine().trim();
-        System.out.println("Fecha de devolución (dd/mm/aaaa): ");
+        System.out.print("Fecha de devolución (dd/mm/aaaa): ");
         String fechaDevolucion=in.nextLine().trim();
         LocalDate fecha = Menu.conversionFecha(fechaDevolucion);
         Prestamo[] prestamos = gestor.getPrestamos();
@@ -122,7 +127,7 @@ public class Menu {
         boolean devolver = gestor.devolverLibro(codigoLibro, fecha);
         if(devolver) {
             if(prestamoActual != null && fecha.isAfter(prestamoActual.getFechaDevolucionPrevista())) {
-                long retraso = ChronoUnit.DAYS.between(prestamoActual.getFechaDevolucionPrevista(), fecha);
+                int retraso = prestamoActual.calcularDiasRetraso();
                 System.out.println("Devolución retrasada con " + retraso + " días");
                 System.out.println("Usuario sancionado por " + retraso + " días (Hasta el " + Menu.formatearFecha(prestamoActual.socio.getFechaFinSancion()) + ")");
             }
@@ -157,6 +162,7 @@ public class Menu {
         if (activo == false){
             System.out.println("No hay ningún préstamo activo");
         }
+
     }
     public void mostrarUsuariosSancionados(){
         Usuario[] usuarios = gestor.getUsuarios();
@@ -175,7 +181,7 @@ public class Menu {
         Usuario[] usuarios = gestor.getUsuarios();
         boolean actualizar = false;
         for(int i=0; i<gestor.getNumeroUsuarios(); i++){
-            if(usuarios[i].getFechaFinSancion().isBefore(LocalDate.now())){
+            if(usuarios[i].estaSancionado() && usuarios[i].getFechaFinSancion().isBefore(LocalDate.now())){
                 usuarios[i].levantarSancion();
                 actualizar = true;
             }
